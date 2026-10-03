@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, redirect, render_template
 import sqlite3
 
 app = Flask(__name__)
@@ -73,8 +73,24 @@ def home():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    return "Registration page coming soon"
+    if request.method == "POST":
+        name = request.form["name"]
+        email = request.form["email"]
+        password = request.form["password"]
 
+        db = get_db()
+
+        db.execute(
+            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+            (name, email, password)
+        )
+
+        db.commit()
+        db.close()
+
+        return redirect("/login")
+
+    return render_template("register.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
